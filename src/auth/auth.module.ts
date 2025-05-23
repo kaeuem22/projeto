@@ -8,6 +8,7 @@ import { UsuarioService } from 'src/usuario/usuario.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
+import { PermissionsGuard } from './permissions.guard';
 
 @Module({
   imports: [
@@ -15,15 +16,19 @@ import { AuthGuard } from './auth.guard';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '5m' },
+      signOptions: { expiresIn: '2h' },
     }),
   ],
   providers: [
     AuthService,
-    UsuarioService, 
-    PrismaService, 
-    {provide: APP_GUARD, 
-    useClass: AuthGuard}
+    UsuarioService,
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard, // Aplica autenticação globalmente
+    },
+    // O PermissionsGuard **não** é global — é aplicado por rota com @UseGuards
+    PermissionsGuard,
   ],
   controllers: [AuthController],
   exports: [AuthService],

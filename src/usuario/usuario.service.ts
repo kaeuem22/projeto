@@ -29,6 +29,19 @@ async findByEmail(email: string) {
   });
 }
 
+async findByEmailWithPermissions(email: string) {
+  return this.prisma.usuario.findFirst({
+    where: { email },
+    include: {
+      usuario_permissao: {
+        include: {
+          permissao: true,
+        },
+      },
+    },
+  });
+}
+
 async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
   return this.prisma.usuario.update({
     where: { id }, // Encontra o usuário pelo ID
