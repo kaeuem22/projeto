@@ -10,6 +10,8 @@ import { ProfessorModule } from './professor/professor.module';
 import { TurmaModule } from './turma/turma.module';
 import { UniversidadeModule } from './universidade/universidade.module';
 import { AuthModule } from './auth/auth.module';
+import { EmailService } from './email/email.service';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -21,9 +23,10 @@ import { AuthModule } from './auth/auth.module';
      EnderecoModule, 
      ProfessorModule, 
      TurmaModule, 
-     UniversidadeModule
+     UniversidadeModule,
+     EmailModule
     ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EmailService],
 })
 export class AppModule {}

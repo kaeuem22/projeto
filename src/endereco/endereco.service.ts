@@ -1,26 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import { UpdateEnderecoDto } from './dto/update-endereco.dto';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class EnderecoService {
-  create(createEnderecoDto: CreateEnderecoDto) {
-    return 'This action adds a new endereco';
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService,
+  ) {}
+
+  async create(createEnderecoDto: CreateEnderecoDto) {
+    const cep = createEnderecoDto.cep.replace(/\D/g, '');
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`https://brasilapi.com.br/api/cep/v1/${cep}`),
+      );
+      const data = response.data;
+
+      return await this.prisma.endereco.create({
+        data: {
+          cep: data.cep,
+          cidade: data.city,
+          logradouro: data.street,
+          bairro: data.neighborhood,
+          numero: createEnderecoDto.numero,
+          complemento: createEnderecoDto.complemento ?? '',
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        'CEP inválido ou erro ao buscar na BrasilAPI',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  findAll() {
-    return `This action returns all endereco`;
+  async findAll() {
+    return this.prisma.endereco.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} endereco`;
+  async findOne(id: number) {
+    return this.prisma.endereco.findUnique({ where: { id } });
   }
 
-  update(id: number, updateEnderecoDto: UpdateEnderecoDto) {
-    return `This action updates a #${id} endereco`;
+  async update(id: number, updateEnderecoDto: UpdateEnderecoDto) {
+    return this.prisma.endereco.update({
+      where: { id },
+      data: updateEnderecoDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} endereco`;
+  async remove(id: number) {
+    return this.prisma.endereco.delete({ where: { id } });
   }
 }
