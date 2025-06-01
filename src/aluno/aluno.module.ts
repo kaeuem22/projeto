@@ -4,7 +4,7 @@ import { AlunoController } from './aluno.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports:[PrismaModule],
+  imports: [PrismaModule],
   controllers: [AlunoController],
   providers: [AlunoService],
 })

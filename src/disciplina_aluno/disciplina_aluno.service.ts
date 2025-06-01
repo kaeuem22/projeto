@@ -1,26 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDisciplinaAlunoDto } from './dto/create-disciplina_aluno.dto';
 import { UpdateDisciplinaAlunoDto } from './dto/update-disciplina_aluno.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DisciplinaAlunoService {
-  create(createDisciplinaAlunoDto: CreateDisciplinaAlunoDto) {
-    return 'This action adds a new disciplinaAluno';
+constructor(private readonly prisma: PrismaService){}
+
+  async create(createDisciplinaAlunoDto: CreateDisciplinaAlunoDto) {
+     return await this.prisma.disciplina_aluno.create({
+    data: createDisciplinaAlunoDto, 
+  });
   }
 
-  findAll() {
-    return `This action returns all disciplinaAluno`;
-  }
+async findAll() {
+  return this.prisma.disciplina_aluno.findMany(); 
+}
 
-  findOne(id: number) {
-    return `This action returns a #${id} disciplinaAluno`;
-  }
+async findOne(id: number) {
+  return this.prisma.disciplina_aluno.findUnique({
+    where: { id }, // Busca pelo ID
+  });
+}
 
-  update(id: number, updateDisciplinaAlunoDto: UpdateDisciplinaAlunoDto) {
-    return `This action updates a #${id} disciplinaAluno`;
-  }
+async update(id: number, updateDisciplinaAlunoDto: UpdateDisciplinaAlunoDto) {
+  return this.prisma.disciplina_aluno.update({
+    where: { id }, // Encontra o usuário pelo ID
+    data: updateDisciplinaAlunoDto, // Atualiza com os novos dados
+  });
+}
 
-  remove(id: number) {
-    return `This action removes a #${id} disciplinaAluno`;
-  }
+async remove(id: number) {
+  return this.prisma.disciplina_aluno.delete({
+    where: { id }, // Remove pelo ID
+  });
+}
 }
